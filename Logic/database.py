@@ -4,11 +4,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_NAME = os.getenv("DATABASE_NAME")
-DATBASE_USER = os.getenv("DATBASE_USER")
-DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
-HOST = os.getenv("HOST")
-PORT = os.getenv("PORT")
+DATABASE_NAME = os.getenv("PGDATABASE")
+DATBASE_USER = os.getenv("PGUSER")
+DATABASE_PASSWORD = os.getenv("PGPASSWORD")
+HOST = os.getenv("PGHOST")
+PORT = os.getenv("PGPORT")
 
 db = PostgresqlDatabase(
     DATABASE_NAME, user=DATBASE_USER, password=DATABASE_PASSWORD, host=HOST, port=PORT
