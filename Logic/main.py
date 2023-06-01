@@ -8,6 +8,7 @@ import sqlite3
 import os
 import io
 import uuid
+import time
 
 
 from aiogram.types import (
@@ -391,6 +392,7 @@ async def get_stairs(message: types.Message):
                 caption=f"{product.description} va narxi {product.price}",
                 reply_markup=order_product,
             )
+        time.sleep(2)
     await CategoryListStates.next()
     db.close()
 

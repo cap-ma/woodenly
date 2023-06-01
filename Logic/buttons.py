@@ -35,11 +35,6 @@ category_button = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="Zinalar"),
-            KeyboardButton(text="Eshiklar"),
-        ],
-        [
-            KeyboardButton(text="Darvoza"),
-            KeyboardButton(text="Karavot"),
         ],
         [KeyboardButton(text="Asosiy")],
     ],
