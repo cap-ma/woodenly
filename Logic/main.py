@@ -74,7 +74,7 @@ async def send_welcome(message: types.Message):
     logging.info("user id is %r", message.from_user.id)
     logging.info("user id type is %r", type(message.from_user.id))
 
-    if message.from_user.id == ADMIN_USER_ID:
+    if message.from_user.id == int(ADMIN_USER_ID):
         await AdminAddProductStates.press_buttun_stair.set()
         await message.reply(
             "Salom Admin aka,",
