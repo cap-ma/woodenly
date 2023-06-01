@@ -1,1 +1,1 @@
-web: python Logic/dn.py
+web: python Logic/main.py
