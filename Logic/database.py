@@ -34,11 +34,11 @@ class Complaint(Model):
 
 
 def create_connection():
-    return db.connect()
+    db.connect()
 
 
 def close_connection():
-    return db.close()
+    db.close()
 
 
 def create_product_tables():
