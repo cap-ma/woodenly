@@ -1,0 +1,60 @@
+from peewee import *
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DATABASE_NAME = os.getenv("DATABASE_NAME")
+DATBASE_USER = os.getenv("DATBASE_USER")
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+HOST = os.getenv("HOST")
+PORT = os.getenv("PORT")
+
+db = PostgresqlDatabase(
+    DATABASE_NAME, user=DATBASE_USER, password=DATABASE_PASSWORD, host=HOST, port=PORT
+)
+
+
+class Product(Model):
+    image = CharField()
+    description = TextField()
+    price = FloatField()
+
+    class Meta:
+        database = db
+
+
+class Complaint(Model):
+    image = CharField()
+    phone_number = CharField()
+    description = TextField()
+
+    class Meta:
+        database = db
+
+
+def create_connection():
+    return db.connect()
+
+
+def close_connection():
+    return db.close()
+
+
+def create_product_tables():
+    with db:
+        db.create_tables([Product])
+
+
+def create_complaint_tables():
+    with db:
+        db.create_tables([Complaint])
+
+
+def get_all_products():
+    products = Product.select()
+    return products
+
+
+def save_order():
+    pass
