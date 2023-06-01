@@ -155,10 +155,8 @@ async def get_price_of_product(message: types.Message, state=FSMContext):
     description = data["description"]
     price = data["price"]
 
-    db.connect()
     product = Product(image=image_path, description=description, price=price)
     product.save()
-    db.close()
 
     await state.finish()
 
@@ -339,12 +337,10 @@ async def get_description(message: types.Message, state: FSMContext):
         number = data["phone_number"]
         description = message.text
 
-    db.connect()
     product = Complaint(
         image=image_path, description=description, phone_number=number["phone_number"]
     )
     product.save()
-    db.close()
 
     await bot.send_photo(
         chat_id=ADMIN_LOG_GROUP,
@@ -373,7 +369,6 @@ async def get_all_category(message: types.Message, state: FSMContext):
 
 @dp.message_handler(Text(equals="Zinalar"), state=CategoryListStates.choose_category)
 async def get_stairs(message: types.Message):
-    db.connect()
     products = Product.select()
 
     images = []
@@ -394,7 +389,6 @@ async def get_stairs(message: types.Message):
             )
         time.sleep(2)
     await CategoryListStates.next()
-    db.close()
 
 
 @dp.callback_query_handler(state=CategoryListStates.get_order)
@@ -461,4 +455,9 @@ async def get_phone_number(message: types.Message, state: FSMContext):
 
 
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
+    db.connect()
+
+    try:
+        executor.start_polling(dp, skip_updates=True)
+    finally:
+        db.close()
