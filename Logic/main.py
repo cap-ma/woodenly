@@ -68,6 +68,10 @@ db = PostgresqlDatabase(
 
 @dp.message_handler(commands=["start"])
 async def send_welcome(message: types.Message):
+    logging.info("ADMIN USER ID is %r", ADMIN_USER_ID)
+    logging.info("Admin log group is   %r", ADMIN_LOG_GROUP)
+    
+    
     if message.from_user.id == ADMIN_USER_ID:
         await AdminAddProductStates.press_buttun_stair.set()
         await message.reply(
