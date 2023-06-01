@@ -15,14 +15,19 @@ from aiogram.types import (
     InlineKeyboardMarkup,
 )
 
-
+from peewee import *
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher import FSMContext, filters
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from PIL import Image
-from database import create_connection, close_connection, Product,Complaint
-from order_states import OrderStates, AdminAddProductStates, CategoryListStates,ComplainStates
+from database import create_connection, close_connection, Product, Complaint
+from order_states import (
+    OrderStates,
+    AdminAddProductStates,
+    CategoryListStates,
+    ComplainStates,
+)
 
 from buttons import (
     button,
@@ -37,9 +42,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_TOKEN = os.getenv('API_TOKEN')
-ADMIN_USER_ID = os.getenv('ADMIN_USER_ID')
-ADMIN_LOG_GROUP = os.getenv('ADMIN_LOG_GROUP')
+API_TOKEN = os.getenv("API_TOKEN")
+ADMIN_USER_ID = os.getenv("ADMIN_USER_ID")
+ADMIN_LOG_GROUP = os.getenv("ADMIN_LOG_GROUP")
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -49,6 +54,16 @@ bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
+
+DATABASE_NAME = os.getenv("DATABASE_NAME")
+DATBASE_USER = os.getenv("DATBASE_USER")
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+HOST = os.getenv("HOST")
+PORT = os.getenv("PORT")
+
+db = PostgresqlDatabase(
+    DATABASE_NAME, user=DATBASE_USER, password=DATABASE_PASSWORD, host=HOST, port=PORT
+)
 
 
 @dp.message_handler(commands=["start"])
@@ -70,11 +85,11 @@ async def send_welcome(message: types.Message):
         )
 
 
-
 # Cancel all states
 
 
 # BACK into prevoius State
+
 
 ###############ADMIN##################
 @dp.message_handler(
@@ -82,7 +97,7 @@ async def send_welcome(message: types.Message):
 )
 async def get_image_press_button(message: types.Message, state=FSMContext):
     await AdminAddProductStates.next()
-    
+
     return await message.reply(
         "Mahsulot rasmini kiriting ", reply_markup=types.ReplyKeyboardRemove()
     )
@@ -97,20 +112,16 @@ async def get_image_not_press_button(message: types.Message, state=FSMContext):
     content_types=types.ContentType.PHOTO, state=AdminAddProductStates.image
 )
 async def get_image_of_product(message: types.Message, state=FSMContext):
-
-    
-
     filename = f"data/{uuid.uuid4()}.jpg"
 
     await message.photo[-1].download(destination_file=filename)
-    
-    image=Image.open(filename)
-   
-    resized_image = image.resize((800,900))
-    
+
+    image = Image.open(filename)
+
+    resized_image = image.resize((800, 900))
+
     resized_image.save(filename)
-    
-  
+
     async with state.proxy() as data:
         data["image_path"] = filename
 
@@ -136,12 +147,11 @@ async def get_price_of_product(message: types.Message, state=FSMContext):
     image_path = data["image_path"]
     description = data["description"]
     price = data["price"]
-   
-    create_connection()
+
+    db.connect()
     product = Product(image=image_path, description=description, price=price)
     product.save()
-    close_connection()
-
+    db.close()
 
     await state.finish()
 
@@ -149,15 +159,12 @@ async def get_price_of_product(message: types.Message, state=FSMContext):
     await send_welcome(message=message)
 
 
-
-
 #####################################
+
 
 @dp.message_handler(state="*", commands="Asosiy")
 @dp.message_handler(Text(equals="Asosiy", ignore_case=True), state="*")
 async def cancel_handler(message: types.Message, state: FSMContext):
-   
-
     current_state = await state.get_state()
     if current_state is None:
         return
@@ -167,6 +174,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await state.finish()
     # And remove keyboard (just in case)
     await send_welcome(message=message)
+
 
 @dp.message_handler(Text(equals="🛒 2.Buyurtma"))
 async def post_order(message: types.Message):
@@ -279,32 +287,35 @@ async def get_product_city_in_order(message: types.Message, state: FSMContext):
 
 @dp.message_handler(Text(equals="😡 3.Shikoyat"))
 async def complain(message: types.Message):
-
     await ComplainStates.phone_number.set()
-    await message.answer("Telefon raqamingizni kiriting",reply_markup=phone_number_share_button)
+    await message.answer(
+        "Telefon raqamingizni kiriting", reply_markup=phone_number_share_button
+    )
 
-@dp.message_handler(content_types=types.ContentType.CONTACT,state=ComplainStates.phone_number)
-async def get_phone_number_for_complain(message:types.Message,state:FSMContext):
 
+@dp.message_handler(
+    content_types=types.ContentType.CONTACT, state=ComplainStates.phone_number
+)
+async def get_phone_number_for_complain(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['phone_number']=message.contact
+        data["phone_number"] = message.contact
     await ComplainStates.next()
 
     await message.answer("Iltimos mahsulotdagi kamchilikni rasmga tushirib yuboring")
 
-@dp.message_handler(content_types=types.ContentType.PHOTO,state=ComplainStates.image)
-async def get_image_of_complain_product(message:types.Message,state:FSMContext):
 
+@dp.message_handler(content_types=types.ContentType.PHOTO, state=ComplainStates.image)
+async def get_image_of_complain_product(message: types.Message, state: FSMContext):
     filename = f"complaint/{uuid.uuid4()}.jpg"
 
     await message.photo[-1].download(destination_file=filename)
-    
-    image=Image.open(filename)
+
+    image = Image.open(filename)
     print(image)
-    resized_image = image.resize((700,800))
-    
+    resized_image = image.resize((700, 800))
+
     resized_image.save(filename)
-    
+
     print("what is up")
     async with state.proxy() as data:
         data["image_path"] = filename
@@ -313,49 +324,31 @@ async def get_image_of_complain_product(message:types.Message,state:FSMContext):
 
     await message.answer("iltimos kamchilik haqida batafsilroq yozsangiz ")
 
-@dp.message_handler(filters.Text ,state=ComplainStates.description)
-async def get_description(message:types.Message,state:FSMContext):
 
+@dp.message_handler(filters.Text, state=ComplainStates.description)
+async def get_description(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        
-        image_path=data["image_path"]
-        number=data["phone_number"]
-        description=message.text
+        image_path = data["image_path"]
+        number = data["phone_number"]
+        description = message.text
 
-
-    create_connection()
-    product = Complaint(image=image_path, description=description, phone_number=number['phone_number'])
+    db.connect()
+    product = Complaint(
+        image=image_path, description=description, phone_number=number["phone_number"]
+    )
     product.save()
-    close_connection()
+    db.close()
 
-   
-
-    
     await bot.send_photo(
         chat_id=ADMIN_LOG_GROUP,
-        photo=open(image_path,'rb'),
+        photo=open(image_path, "rb"),
         caption=f"🔴⁉️ SHIKOYAT 🔴⁉️\n\n☎️ 1.Nomer: {number['phone_number']}\n📝 2.Batafsil: {description} ",
-        
     )
 
     await message.answer("Tez orada Muammoingiz ko'rib chiqiladi,")
-    
-    
+
     await state.finish()
     await send_welcome(message=message)
-    
-    
-
-
-
-
-
-
-
-
-
-
-
 
 
 @dp.message_handler(Text(equals="🕧 4.Buyurtma Holati"))
@@ -373,14 +366,14 @@ async def get_all_category(message: types.Message, state: FSMContext):
 
 @dp.message_handler(Text(equals="Zinalar"), state=CategoryListStates.choose_category)
 async def get_stairs(message: types.Message):
-    create_connection()
+    db.connect()
     products = Product.select()
 
     images = []
 
     for product in products:
         images.append(product.image)
-        
+
         order_product = InlineKeyboardMarkup(row_width=1).add(
             InlineKeyboardButton(text="buyurtma", callback_data=product.image),
         )
@@ -393,18 +386,16 @@ async def get_stairs(message: types.Message):
                 reply_markup=order_product,
             )
     await CategoryListStates.next()
-    close_connection()
+    db.close()
 
 
 @dp.callback_query_handler(state=CategoryListStates.get_order)
 async def handle_button_click(callback: types.CallbackQuery, state=FSMContext):
     # Answer the callback query
-  
+
     dir_list = os.listdir("data")
     for x in dir_list:
-       
         if callback.data == f"data/{x}":
-           
             async with state.proxy() as data:
                 data["image_path"] = callback.data
 
