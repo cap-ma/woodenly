@@ -373,6 +373,7 @@ async def get_all_category(message: types.Message, state: FSMContext):
 
 @dp.message_handler(Text(equals="Zinalar"), state=CategoryListStates.choose_category)
 async def get_stairs(message: types.Message):
+    create_connection()
     products = Product.select()
 
     images = []
