@@ -56,17 +56,6 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 
-DATABASE_NAME = os.getenv("PGDATABASE")
-DATBASE_USER = os.getenv("PGUSER")
-DATABASE_PASSWORD = os.getenv("PGPASSWORD")
-HOST = os.getenv("PGHOST")
-PORT = os.getenv("PGPORT")
-
-db = PostgresqlDatabase(
-    DATABASE_NAME, user=DATBASE_USER, password=DATABASE_PASSWORD, host=HOST, port=PORT
-)
-
-
 @dp.message_handler(commands=["start"])
 async def send_welcome(message: types.Message):
     logging.info("ADMIN USER ID is %r", ADMIN_USER_ID)
@@ -455,9 +444,9 @@ async def get_phone_number(message: types.Message, state: FSMContext):
 
 
 if __name__ == "__main__":
-    db.connect()
+    create_connection()
 
     try:
         executor.start_polling(dp, skip_updates=True)
     finally:
-        db.close()
+        close_connection()
