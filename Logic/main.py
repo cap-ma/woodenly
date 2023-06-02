@@ -108,7 +108,7 @@ async def get_image_not_press_button(message: types.Message, state=FSMContext):
     content_types=types.ContentType.PHOTO, state=AdminAddProductStates.image
 )
 async def get_image_of_product(message: types.Message, state=FSMContext):
-    filename = f"data/{uuid.uuid4()}.jpg"
+    filename = f"data/{uuid.uuid4()}.png"
 
     await message.photo[-1].download(destination_file=filename)
 
