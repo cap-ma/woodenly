@@ -99,9 +99,15 @@ async def get_image_press_button(message: types.Message, state=FSMContext):
     )
 
 
-@dp.message_handler(filters.Text, state=AdminAddProductStates.press_buttun_stair)
-async def get_image_not_press_button(message: types.Message, state=FSMContext):
-    return await message.reply("tugamni bosish orqali Kontakt kiriting ")
+@dp.message_handler(state="*", commands="Admin Asosiy")
+@dp.message_handler(Text(equals="Admin Asosiy", ignore_case=True), state="*")
+async def back_into_admin_main(message: types.Message, state=FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+
+    await state.finish()
+    await send_welcome(message=message)
 
 
 @dp.message_handler(

@@ -44,7 +44,7 @@ category_button = ReplyKeyboardMarkup(
 admin_category_add_button = ReplyKeyboardMarkup(
     resize_keyboard=True,
     keyboard=[
-        [KeyboardButton(text="Ortga"), KeyboardButton(text="Zinalar Qo'shish")],
+        [KeyboardButton(text="Admin Asosiy"), KeyboardButton(text="Zinalar Qo'shish")],
         [],
     ],
 )
