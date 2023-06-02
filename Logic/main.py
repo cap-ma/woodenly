@@ -95,7 +95,7 @@ async def get_image_press_button(message: types.Message, state=FSMContext):
     await AdminAddProductStates.next()
 
     return await message.reply(
-        "Mahsulot rasmini kiriting ", reply_markup=types.ReplyKeyboardRemove()
+        "Mahsulot rasmini kiriting ", reply_markup=admin_category_add_button
     )
 
 
