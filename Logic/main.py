@@ -373,7 +373,7 @@ async def get_stairs(message: types.Message):
             await bot.send_photo(
                 chat_id=message.from_user.id,
                 photo=photo_path,
-                caption=f"{product.description} va narxi {product.price}",
+                caption=f"📜 Ma'lumot: {product.description} va \n💰 Narxi: {product.price}",
                 reply_markup=order_product,
             )
         time.sleep(2)
