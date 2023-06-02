@@ -351,7 +351,7 @@ async def get_description(message: types.Message, state: FSMContext):
 
 @dp.message_handler(Text(equals="🕧 4.Buyurtma Holati"))
 async def staus_product(message: types.Message):
-    await message.answer("pressed Tovar Holati")
+    await message.answer(" Hozirda Buyurtma holati bo'yicha ish ketyapti")
 
 
 @dp.message_handler(Text(equals="📦 1.Mahsulot Turlari"))
