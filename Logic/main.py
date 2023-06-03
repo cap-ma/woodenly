@@ -447,6 +447,11 @@ async def get_phone_number(message: types.Message, state: FSMContext):
     await send_welcome(message=message)
 
 
+@dp.message_handler(filters.Text)
+async def get_price_of_product(message: types.Message):
+    await message.answer("")
+
+
 # And remove keyboard (just in case)
 
 
@@ -455,5 +460,6 @@ if __name__ == "__main__":
 
     try:
         executor.start_polling(dp, skip_updates=True)
+
     finally:
         close_connection()
