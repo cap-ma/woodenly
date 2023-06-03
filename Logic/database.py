@@ -9,9 +9,14 @@ DATBASE_USER = os.getenv("PGUSER")
 DATABASE_PASSWORD = os.getenv("PGPASSWORD")
 
 PORT = os.getenv("PGPORT")
+HOST = os.getenv("PGHOST")
 
 db = MySQLDatabase(
-    DATABASE_NAME, user=DATBASE_USER, password=DATABASE_PASSWORD, port=int(PORT)
+    DATABASE_NAME,
+    user=DATBASE_USER,
+    password=DATABASE_PASSWORD,
+    port=int(PORT),
+    host=HOST,
 )
 
 
