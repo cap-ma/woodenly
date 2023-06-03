@@ -51,7 +51,7 @@ PROXY_URL = os.getenv("PROXY_URL")
 logging.basicConfig(level=logging.INFO)
 
 # Initialize bot and dispatcher
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=API_TOKEN, proxy=PROXY_URL)
 
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
