@@ -46,6 +46,7 @@ load_dotenv()
 API_TOKEN = os.getenv("API_TOKEN")
 ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID"))
 ADMIN_LOG_GROUP = int(os.getenv("ADMIN_LOG_GROUP"))
+PROXY_URL = os.getenv("PROXY_URL")
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
