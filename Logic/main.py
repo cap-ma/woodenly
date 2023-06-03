@@ -44,8 +44,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 API_TOKEN = os.getenv("API_TOKEN")
-ADMIN_USER_ID = os.getenv("ADMIN_USER_ID")
-ADMIN_LOG_GROUP = os.getenv("ADMIN_LOG_GROUP")
+ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID"))
+ADMIN_LOG_GROUP = int(os.getenv("ADMIN_LOG_GROUP"))
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 

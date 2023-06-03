@@ -11,7 +11,7 @@ DATABASE_PASSWORD = os.getenv("PGPASSWORD")
 PORT = os.getenv("PGPORT")
 
 db = MySQLDatabase(
-    DATABASE_NAME, user=DATBASE_USER, password=DATABASE_PASSWORD, port=PORT
+    DATABASE_NAME, user=DATBASE_USER, password=DATABASE_PASSWORD, port=int(PORT)
 )
 
 
