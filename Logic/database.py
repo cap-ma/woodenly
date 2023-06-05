@@ -11,7 +11,7 @@ DATABASE_PASSWORD = os.getenv("PGPASSWORD")
 PORT = os.getenv("PGPORT")
 HOST = os.getenv("PGHOST")
 
-db = MySQLDatabase(
+db = PostgresqlDatabase(
     DATABASE_NAME,
     user=DATBASE_USER,
     password=DATABASE_PASSWORD,

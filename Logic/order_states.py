@@ -26,7 +26,6 @@ class ComplainStates(StatesGroup):
 
 
 class CategoryListStates(StatesGroup):
-    choose_category = State()
     get_order = State()
 
     quantity = State()

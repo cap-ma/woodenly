@@ -10,6 +10,7 @@ psycopg2 = "*"
 pillow = "*"
 uuid = "*"
 python-dotenv = "*"
+pymysql = "*"
 
 [dev-packages]
 

@@ -51,7 +51,7 @@ PROXY_URL = os.getenv("PROXY_URL")
 logging.basicConfig(level=logging.INFO)
 
 # Initialize bot and dispatcher
-bot = Bot(token=API_TOKEN, proxy=PROXY_URL)
+bot = Bot(token=API_TOKEN)
 
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
@@ -59,19 +59,13 @@ dp = Dispatcher(bot, storage=storage)
 
 @dp.message_handler(commands=["start"])
 async def send_welcome(message: types.Message):
-    logging.info("ADMIN USER ID is %r", ADMIN_USER_ID)
-    logging.info("ADMIN USER ID TyPE is %r", type(ADMIN_USER_ID))
-    logging.info("Admin log group is   %r", ADMIN_LOG_GROUP)
-    logging.info("user id is %r", message.from_user.id)
-    logging.info("user id type is %r", type(message.from_user.id))
-
     if message.from_user.id == int(ADMIN_USER_ID):
         await AdminAddProductStates.press_buttun_stair.set()
         await message.reply(
             "Salom Admin aka,",
             reply_markup=admin_category_add_button,
         )
-        print("helllllloooo")
+
     else:
         """
         This handler will be called when user sends `/start` or `/help` command
@@ -80,9 +74,6 @@ async def send_welcome(message: types.Message):
             "Salom  👋, \nWooden kompaniyasining mijozlar botiga \nXush kelibsiz,",
             reply_markup=button,
         )
-
-
-# Cancel all states
 
 
 # BACK into prevoius State
@@ -168,11 +159,12 @@ async def get_price_of_product(message: types.Message, state=FSMContext):
 async def cancel_handler(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
-        return
+        await send_welcome(message=message)
 
-    logging.info("Cancelling state %r", current_state)
+    logging.warn("Cancelling state %r", current_state)
     # Cancel state and inform user about it
     await state.finish()
+
     # And remove keyboard (just in case)
     await send_welcome(message=message)
 
@@ -356,15 +348,15 @@ async def staus_product(message: types.Message):
 
 
 @dp.message_handler(Text(equals="📦 1.Mahsulot Turlari"))
-async def get_all_category(message: types.Message, state: FSMContext):
-    await CategoryListStates.choose_category.set()
+async def get_all_category(message: types.Message):
+    print("fdf")
     await message.answer(
         "Istalgan Turdagi mahsulot tanlang", reply_markup=category_button
     )
 
 
-@dp.message_handler(Text(equals="Zinalar"), state=CategoryListStates.choose_category)
-async def get_stairs(message: types.Message):
+@dp.message_handler(Text(equals="Zinalar"))
+async def get_stairs(message: types.Message, state: FSMContext):
     products = Product.select()
 
     images = []
@@ -376,15 +368,16 @@ async def get_stairs(message: types.Message):
             InlineKeyboardButton(text="buyurtma", callback_data=product.image),
         )
 
-        with open(product.image, "rb") as photo_path:
-            await bot.send_photo(
-                chat_id=message.from_user.id,
-                photo=photo_path,
-                caption=f"📜 Ma'lumot: {product.description} va \n💰 Narxi: {product.price}",
-                reply_markup=order_product,
-            )
-        time.sleep(2)
-    await CategoryListStates.next()
+        photo_path = open(product.image, "rb")
+        await bot.send_photo(
+            chat_id=message.from_user.id,
+            photo=photo_path,
+            caption=f"📜 Ma'lumot: {product.description} va \n💰 Narxi: {product.price}",
+            reply_markup=order_product,
+        )
+        photo_path.close()
+
+    await CategoryListStates.get_order.set()
 
 
 @dp.callback_query_handler(state=CategoryListStates.get_order)
@@ -447,9 +440,9 @@ async def get_phone_number(message: types.Message, state: FSMContext):
     await send_welcome(message=message)
 
 
-@dp.message_handler(filters.Text)
+@dp.message_handler(filters.Text, state="*")
 async def get_price_of_product(message: types.Message):
-    await message.answer("")
+    await message.answer(message.text)
 
 
 # And remove keyboard (just in case)
