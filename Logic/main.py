@@ -22,7 +22,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher import FSMContext, filters
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from PIL import Image
-from database import create_connection, close_connection, Product, Complaint
+from database import create_connection, close_connection, Product, Complaint, db
 from order_states import (
     OrderStates,
     AdminAddProductStates,
@@ -141,9 +141,10 @@ async def get_price_of_product(message: types.Message, state=FSMContext):
     image_path = data["image_path"]
     description = data["description"]
     price = data["price"]
-
+    create_connection()
     product = Product(image=image_path, description=description, price=price)
     product.save()
+    close_connection()
 
     await state.finish()
 
@@ -160,6 +161,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
         await send_welcome(message=message)
+        return
 
     logging.warn("Cancelling state %r", current_state)
     # Cancel state and inform user about it
@@ -324,11 +326,12 @@ async def get_description(message: types.Message, state: FSMContext):
         image_path = data["image_path"]
         number = data["phone_number"]
         description = message.text
-
+    create_connection()
     product = Complaint(
         image=image_path, description=description, phone_number=number["phone_number"]
     )
     product.save()
+    close_connection()
 
     await bot.send_photo(
         chat_id=ADMIN_LOG_GROUP,
@@ -355,8 +358,9 @@ async def get_all_category(message: types.Message):
     )
 
 
-@dp.message_handler(Text(equals="Zinalar"))
+@dp.message_handler(Text(equals="Zinalar"), state="*")
 async def get_stairs(message: types.Message, state: FSMContext):
+    db.connect(reuse_if_open=True)
     products = Product.select()
 
     images = []
@@ -376,14 +380,14 @@ async def get_stairs(message: types.Message, state: FSMContext):
             reply_markup=order_product,
         )
         photo_path.close()
+    close_connection()
 
-    await CategoryListStates.get_order.set()
 
-
-@dp.callback_query_handler(state=CategoryListStates.get_order)
+# Handler for inline keyboard button callbacks
+@dp.callback_query_handler()
 async def handle_button_click(callback: types.CallbackQuery, state=FSMContext):
     # Answer the callback query
-
+    print("thereee")
     dir_list = os.listdir("data")
     for x in dir_list:
         if callback.data == f"data/{x}":
@@ -394,7 +398,7 @@ async def handle_button_click(callback: types.CallbackQuery, state=FSMContext):
                 callback.id, text="Buyurtma maahsulotingiz haqida kiriting "
             )
 
-    await CategoryListStates.next()
+    await CategoryListStates.quantity.set()
     await bot.send_message(
         chat_id=callback.message.chat.id,
         text="Mahsulotni qncha hajimda buyurtma qilmoqchisiz,masalan 10 kv metr",
@@ -449,10 +453,4 @@ async def get_price_of_product(message: types.Message):
 
 
 if __name__ == "__main__":
-    create_connection()
-
-    try:
-        executor.start_polling(dp, skip_updates=True)
-
-    finally:
-        close_connection()
+    executor.start_polling(dp, skip_updates=True)

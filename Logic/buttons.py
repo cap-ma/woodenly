@@ -48,3 +48,48 @@ admin_category_add_button = ReplyKeyboardMarkup(
         [],
     ],
 )
+
+###########RUSSIAN BUTTONS############
+from aiogram.types import (
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+)
+
+phone_number_share_button = ReplyKeyboardMarkup(resize_keyboard=True)
+phone_number_button = KeyboardButton(text="Номер телефона", request_contact=True)
+
+one_state_back = KeyboardButton(text="назад")
+cancel = KeyboardButton(text="главный")
+cancel_pack = ReplyKeyboardMarkup(resize_keyboard=True)
+cancel_pack.add(cancel, one_state_back)
+
+phone_number_share_button.add(cancel, phone_number_button)
+
+button = ReplyKeyboardMarkup(
+    resize_keyboard=True,
+    keyboard=[
+        [
+            KeyboardButton(text="📦 1.Категории продукта"),
+            KeyboardButton(text="🛒 2.Заказ"),
+        ],
+        [
+            KeyboardButton(text="😡 3.Жалоба"),
+            KeyboardButton(text="🕧 4.Cтaтyc заказа"),
+        ],
+    ],
+)
+
+
+category_button = ReplyKeyboardMarkup(
+    resize_keyboard=True,
+    keyboard=[
+        [
+            KeyboardButton(text="Zinalar"),
+        ],
+        [KeyboardButton(text="Asosiy")],
+    ],
+)
+
+###################################
